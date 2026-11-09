@@ -31,6 +31,19 @@ uv run ruff format .
 uv run mypy                     # strict, covers src/ and tests/
 ```
 
+These four run in CI against Python 3.10 through 3.13, so a pull request that skips them
+locally will simply fail there instead. CI also builds the wheel and runs the installed
+console script:
+
+```bash
+uv build --wheel
+uv venv /tmp/smoke-venv && uv pip install --python /tmp/smoke-venv/bin/python dist/*.whl
+scripts/smoke_test.sh /tmp/smoke-venv/bin/arch17p13
+```
+
+Worth running by hand after any change to `pyproject.toml`, the CLI entry point or
+`src/arch17p13/__init__.py`, since nothing in the pytest suite touches the built artefact.
+
 Tests are plain pytest with no plugins beyond `pytest-cov`. Fixture VCFs live in
 `tests/data/`; add one per behaviour rather than overloading an existing file, and prefer a
 fixture over constructing records inline when the behaviour involves parsing.

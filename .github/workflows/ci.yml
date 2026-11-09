@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A new push to the same branch makes the in-flight run obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: checks (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      # Every version runs even after one fails: knowing a failure is 3.10-only,
+      # or universal, is most of the diagnosis.
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    env:
+      # Overrides the .python-version file, which pins the local development version.
+      UV_PYTHON: ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install the project
+        # --locked fails if uv.lock is stale rather than silently resolving something
+        # else, so a dependency change cannot reach main without the lockfile.
+        run: uv sync --locked
+
+      - name: Confirm the interpreter under test
+        # Guards against UV_PYTHON being ignored, which would otherwise show up as four
+        # identical green runs of a single version.
+        run: |
+          uv run python - <<'PY'
+          import sys
+          want = "${{ matrix.python-version }}"
+          have = "{}.{}".format(*sys.version_info[:2])
+          assert have == want, f"expected Python {want}, got {sys.version}"
+          print(sys.version)
+          PY
+
+      - name: pytest
+        # The coverage gate is fail_under = 100 in pyproject.toml; --cov activates it.
+        run: uv run pytest --cov=arch17p13
+
+      - name: ruff check
+        run: uv run ruff check --output-format=github .
+
+      - name: ruff format --check
+        run: uv run ruff format --check .
+
+      - name: mypy --strict
+        run: uv run mypy
+
+  smoke:
+    name: installed CLI (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Build the wheel
+        run: uv build --wheel
+
+      - name: Install the wheel into a clean environment
+        # Deliberately not `uv sync`: the test suite imports from src/, so this is the
+        # only check that the built artefact works, entry point and metadata included.
+        run: |
+          uv venv --python ${{ matrix.python-version }} /tmp/smoke-venv
+          uv pip install --python /tmp/smoke-venv/bin/python dist/*.whl
+
+      - name: Smoke-test the installed CLI
+        run: scripts/smoke_test.sh /tmp/smoke-venv/bin/arch17p13
