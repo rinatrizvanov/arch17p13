@@ -2,6 +2,11 @@
 
 Classify **17p13.1 TP53/WRAP53 structural-variant architecture** from a VCF.
 
+[![CI](https://github.com/rinatrizvanov/arch17p13/actions/workflows/ci.yml/badge.svg)](https://github.com/rinatrizvanov/arch17p13/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](pyproject.toml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 This tool classifies 17p13.1 structural variants into the architecture categories defined in
 `label_spec_v0.9` of the reference implementation, operationalizing the TP53/WRAP53
 co-disruption described by Keegan et al. 2026. The reference implementation is in
@@ -45,11 +50,13 @@ because widening the window would change calls.
 
 ## Install
 
+Not published to PyPI. Install from the repository:
+
 ```bash
-pip install arch17p13          # or: uv add arch17p13
+pip install git+https://github.com/rinatrizvanov/arch17p13.git
 ```
 
-From a checkout:
+Or, for development, from a checkout:
 
 ```bash
 uv sync
@@ -162,8 +169,14 @@ scope, and changing any frozen constant requires a version bump. See [`SCOPE.md`
 uv sync
 uv run pytest --cov=arch17p13   # 191 tests, 100% coverage enforced
 uv run ruff check .
-uv run mypy
+uv run ruff format --check .
+uv run mypy                     # strict, over src/ and tests/
 ```
+
+All four run in CI on Python 3.10, 3.11, 3.12 and 3.13. A second job builds the wheel,
+installs it into a clean environment and runs `scripts/smoke_test.sh` against the installed
+console script — the test suite imports from `src/`, so that is the only check that the
+packaged artefact actually works.
 
 Regenerating the equivalence pins needs a checkout of the reference repository:
 

@@ -29,6 +29,10 @@ semantics only.**
   `a750daf` by `scripts/generate_equivalence.py`. Fifteen agree exactly; the two divergences
   are documented and asserted by name.
 - 191 tests at 100% statement and branch coverage, enforced by a coverage gate.
+- GitHub Actions CI running pytest, `ruff check`, `ruff format --check` and
+  `mypy --strict` on Python 3.10, 3.11, 3.12 and 3.13, plus a job that installs the
+  built wheel into a clean environment and smoke-tests the installed console script.
+- `py.typed`, so type information is usable by downstream `mypy` under PEP 561.
 
 ### Known divergences from the reference implementation
 
@@ -47,3 +51,7 @@ Both are deliberate and tested; full rationale in [`SCOPE.md`](SCOPE.md).
 BED input, GRCh37/hg19 support, liftover, copy-number segment semantics, and any ALT-biology
 or gene-dependency inference. Adding any of these is a new minor version with its own scope
 note.
+
+Not published to PyPI either; install from the repository with
+`pip install git+https://github.com/rinatrizvanov/arch17p13.git`. Packaging for PyPI is its
+own piece of work and is not part of v0.1.
