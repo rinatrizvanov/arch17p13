@@ -1,0 +1,506 @@
+{
+  "provenance": {
+    "description": "Expected architecture calls pinned from the reference implementation's category ladder. These are DepMap-based inferences, not a published gold standard.",
+    "reference_repository": "https://github.com/rinatrizvanov/osteosarcoma-alt-dependency-research",
+    "reference_commit": "a750daf1051be7eae4982cce2e427d4e973bd95f",
+    "reference_module": "part1_alt_classification/src/sv_annotator.py",
+    "reference_module_sha256": "7e1239d11e2d706c1c8cb15ca650a028aa5403a694e3013a823c67c13a372fc9",
+    "generated_by": "scripts/generate_equivalence.py",
+    "generated_at": "2026-11-09T14:44:51Z"
+  },
+  "cases": [
+    {
+      "name": "off_locus_only",
+      "fixture": "neither_offlocus.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "sv1",
+          "chr1",
+          1000000
+        ],
+        [
+          "sv1",
+          "chr1",
+          1050000
+        ],
+        [
+          "sv2",
+          "chr17",
+          2000000
+        ],
+        [
+          "sv2",
+          "chr17",
+          2010000
+        ]
+      ],
+      "reference_category": "Neither",
+      "reference_reason": "No SVs in locus window",
+      "expected_category": "Neither",
+      "divergence": null
+    },
+    {
+      "name": "tp53_coding_single_breakend",
+      "fixture": "tp53_only.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_a",
+          "chr17",
+          7670000
+        ],
+        [
+          "bnd_a",
+          "chr5",
+          100000
+        ]
+      ],
+      "reference_category": "TP53-only",
+      "reference_reason": "TP53_coding records: ['bnd_a']",
+      "expected_category": "TP53-only",
+      "divergence": null
+    },
+    {
+      "name": "wrap53_coding_single_breakend",
+      "fixture": "tcab1_only.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_a",
+          "chr17",
+          7700000
+        ],
+        [
+          "bnd_a",
+          "chr5",
+          100000
+        ]
+      ],
+      "reference_category": "TCAB1-only",
+      "reference_reason": "WRAP53_coding records: ['bnd_a']",
+      "expected_category": "TCAB1-only",
+      "divergence": null
+    },
+    {
+      "name": "reciprocal_pair_hits_both_genes",
+      "fixture": "both_single_sv.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_a|bnd_b",
+          "chr17",
+          7670000
+        ],
+        [
+          "bnd_a|bnd_b",
+          "chr17",
+          7700000
+        ],
+        [
+          "bnd_a|bnd_b",
+          "chr17",
+          7700000
+        ],
+        [
+          "bnd_a|bnd_b",
+          "chr17",
+          7670000
+        ]
+      ],
+      "reference_category": "Both-single-SV",
+      "reference_reason": "Records hitting both WRAP53_coding and TP53_coding: ['bnd_a|bnd_b']",
+      "expected_category": "Both-single-SV",
+      "divergence": null
+    },
+    {
+      "name": "two_events_one_per_gene",
+      "fixture": "both_independent.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_a",
+          "chr17",
+          7670000
+        ],
+        [
+          "bnd_a",
+          "chr5",
+          100000
+        ],
+        [
+          "bnd_c",
+          "chr17",
+          7700000
+        ],
+        [
+          "bnd_c",
+          "chr9",
+          400000
+        ]
+      ],
+      "reference_category": "Both-independent-SVs",
+      "reference_reason": "WRAP53_coding records: ['bnd_c']; TP53_coding records: ['bnd_a']",
+      "expected_category": "Both-independent-SVs",
+      "divergence": null
+    },
+    {
+      "name": "five_records_trips_complex",
+      "fixture": "complex.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "c1",
+          "chr17",
+          7665000
+        ],
+        [
+          "c1",
+          "chr5",
+          100000
+        ],
+        [
+          "c2",
+          "chr17",
+          7670000
+        ],
+        [
+          "c2",
+          "chr5",
+          200000
+        ],
+        [
+          "c3",
+          "chr17",
+          7690000
+        ],
+        [
+          "c3",
+          "chr5",
+          300000
+        ],
+        [
+          "c4",
+          "chr17",
+          7700000
+        ],
+        [
+          "c4",
+          "chr5",
+          400000
+        ],
+        [
+          "c5",
+          "chr17",
+          7705000
+        ],
+        [
+          "c5",
+          "chr5",
+          500000
+        ]
+      ],
+      "reference_category": "Complex",
+      "reference_reason": "5 distinct SV records in locus \u2014 manual review required",
+      "expected_category": "Complex",
+      "divergence": null
+    },
+    {
+      "name": "in_locus_but_no_coding_hit",
+      "fixture": "neither_in_locus.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "n1",
+          "chr17",
+          7665000
+        ],
+        [
+          "n1",
+          "chr5",
+          100000
+        ],
+        [
+          "n2",
+          "chr17",
+          7687550
+        ],
+        [
+          "n2",
+          "chr5",
+          200000
+        ]
+      ],
+      "reference_category": "Neither",
+      "reference_reason": "2 SV(s) in locus window but none hit TP53_coding or WRAP53_coding \u2014 flag for review",
+      "expected_category": "Neither",
+      "divergence": null
+    },
+    {
+      "name": "focal_deletion_spanning_both_genes",
+      "fixture": "svlen_del.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "del_focal",
+          "chr17",
+          7670000
+        ],
+        [
+          "del_focal",
+          "chr17",
+          7705000
+        ]
+      ],
+      "reference_category": "Both-single-SV",
+      "reference_reason": "Records hitting both WRAP53_coding and TP53_coding: ['del_focal']",
+      "expected_category": "Both-single-SV",
+      "divergence": null
+    },
+    {
+      "name": "insertion_contributes_one_breakpoint",
+      "fixture": "insertion.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "ins_a",
+          "chr17",
+          7700000
+        ]
+      ],
+      "reference_category": "TCAB1-only",
+      "reference_reason": "WRAP53_coding records: ['ins_a']",
+      "expected_category": "TCAB1-only",
+      "divergence": null
+    },
+    {
+      "name": "sites_only_vcf",
+      "fixture": "sites_only.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_a",
+          "chr17",
+          7670000
+        ],
+        [
+          "bnd_a",
+          "chr5",
+          100000
+        ]
+      ],
+      "reference_category": "TP53-only",
+      "reference_reason": "TP53_coding records: ['bnd_a']",
+      "expected_category": "TP53-only",
+      "divergence": null
+    },
+    {
+      "name": "breakpoint_past_locus_window",
+      "fixture": "wrap53_outside_window.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_far",
+          "chr17",
+          7715000
+        ],
+        [
+          "bnd_far",
+          "chr5",
+          100000
+        ]
+      ],
+      "reference_category": "Neither",
+      "reference_reason": "No SVs in locus window",
+      "expected_category": "Neither",
+      "divergence": null
+    },
+    {
+      "name": "filter_default_keeps_pass_only",
+      "fixture": "filtered.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "passing",
+          "chr17",
+          7670000
+        ],
+        [
+          "passing",
+          "chr5",
+          200000
+        ]
+      ],
+      "reference_category": "TP53-only",
+      "reference_reason": "TP53_coding records: ['passing']",
+      "expected_category": "TP53-only",
+      "divergence": null
+    },
+    {
+      "name": "filter_override_keeps_everything",
+      "fixture": "filtered.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": false
+      },
+      "breakpoints": [
+        [
+          "lowq",
+          "chr17",
+          7700000
+        ],
+        [
+          "lowq",
+          "chr5",
+          100000
+        ],
+        [
+          "passing",
+          "chr17",
+          7670000
+        ],
+        [
+          "passing",
+          "chr5",
+          200000
+        ]
+      ],
+      "reference_category": "Both-independent-SVs",
+      "reference_reason": "WRAP53_coding records: ['lowq']; TP53_coding records: ['passing']",
+      "expected_category": "Both-independent-SVs",
+      "divergence": null
+    },
+    {
+      "name": "multisample_tumour",
+      "fixture": "multisample.vcf",
+      "options": {
+        "sample": "TUMOR",
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_t",
+          "chr17",
+          7700000
+        ],
+        [
+          "bnd_t",
+          "chr5",
+          100000
+        ]
+      ],
+      "reference_category": "TCAB1-only",
+      "reference_reason": "WRAP53_coding records: ['bnd_t']",
+      "expected_category": "TCAB1-only",
+      "divergence": null
+    },
+    {
+      "name": "multisample_normal",
+      "fixture": "multisample.vcf",
+      "options": {
+        "sample": "NORMAL",
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_n",
+          "chr17",
+          7670000
+        ],
+        [
+          "bnd_n",
+          "chr5",
+          200000
+        ]
+      ],
+      "reference_category": "TP53-only",
+      "reference_reason": "TP53_coding records: ['bnd_n']",
+      "expected_category": "TP53-only",
+      "divergence": null
+    },
+    {
+      "name": "locus_spanning_deletion",
+      "fixture": "spans_locus.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "del_broad",
+          "chr17",
+          7000000
+        ],
+        [
+          "del_broad",
+          "chr17",
+          8000000
+        ]
+      ],
+      "reference_category": "Neither",
+      "reference_reason": "No SVs in locus window",
+      "expected_category": "Neither",
+      "divergence": "Breakpoint semantics agree with the reference here only because this generator feeds breakpoints. The reference's segment path would call this Both-single-SV from interval overlap; that path is a forbidden variable in the Stage 1 pre-registration. This library reports Neither plus the spans_locus flag. See SCOPE.md section 1."
+    },
+    {
+      "name": "contig_without_chr_prefix",
+      "fixture": "chrom_naming.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_a",
+          "17",
+          7670000
+        ],
+        [
+          "bnd_a",
+          "5",
+          100000
+        ]
+      ],
+      "reference_category": "Neither",
+      "reference_reason": "No SVs in locus window",
+      "expected_category": "TP53-only",
+      "divergence": "The reference compares contig names literally against 'chr17', so a VCF using '17' is treated as entirely off-locus and returns Neither. VCFs in the wild use both spellings, so this library normalises '17' to 'chr17' and returns TP53-only. See SCOPE.md section 6."
+    }
+  ]
+}

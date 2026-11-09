@@ -76,12 +76,39 @@ base relative to the reference.
 **5. `Complex` precedence.** Checked before any gene logic, as in the reference. A sample at
 or above the threshold never receives a gene-level call even when both coding windows are hit.
 
+**6. Contig names are normalised — a deliberate divergence, found by the equivalence
+suite.** The reference compares contig names literally against `chr17`, so a file spelling the
+contig `17` is treated as entirely off-locus and classified `Neither`. Both spellings are
+common in real VCFs — Ensembl-style references drop the prefix, UCSC-style keep it — and a
+standalone tool that silently returns `Neither` for half of them would be a trap. This library
+accepts `chr17`, `17`, and case variants, all normalised to `chr17`. The divergence is pinned
+by `tests/test_equivalence.py::TestDocumentedDivergences::test_contig_naming_divergence_is_real`
+and recorded in the equivalence fixtures, where the reference's `Neither` and this library's
+`TP53-only` are both stored for the same input. The reference was not wrong for its own
+purpose — its inputs were a single pipeline with one spelling — but the assumption does not
+survive being handed an arbitrary VCF.
+
 ## Testing posture
 
 Fixture VCFs in `tests/data/` cover one case per category plus the boundary positions where a
 call can flip. The Stage 1 equivalence suite pins expected calls derived from the reference
 implementation at commit `a750daf`; those pinned values come from DepMap-based inference and
 are **inferences, not a published gold standard**.
+
+What the equivalence suite compares, precisely: the reference owns the category ladder, and
+VCF parsing has no counterpart there, so the ladder is what gets pinned. Each case in
+`scripts/generate_equivalence.py` lists its breakpoints explicitly, written by hand to describe
+what the matching fixture VCF contains. Those breakpoints run through the reference's own
+`annotate_breakpoints` and `architecture_call`; the test then parses the fixture VCF with this
+library and compares categories. Specifying the two sides independently is what makes the test
+meaningful — feeding the reference this library's own parser output would have hidden any
+parsing bug from both sides.
+
+Of 17 cases, 15 agree with the reference exactly. The two that do not are the divergences in
+sections 1 and 6, each carrying a written explanation in the fixture file and a test asserting
+it by name. A case is allowed to differ from the reference **only** if it carries that
+explanation: `test_undocumented_cases_agree_with_the_reference_exactly` fails otherwise, which
+is the guard against redefining behaviour without recording why.
 
 ## Change policy
 

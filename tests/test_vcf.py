@@ -78,8 +78,19 @@ class TestRecordIdentity:
     def test_mateid_list_is_sorted_into_one_id(self, tmp_path: Path) -> None:
         vcf = write_vcf(
             tmp_path / "multimate.vcf",
-            [("chr17", "7670000", "zz", "N", "N[chr5:1[", ".", "PASS",
-              "SVTYPE=BND;MATEID=aa,mm", *GT)],
+            [
+                (
+                    "chr17",
+                    "7670000",
+                    "zz",
+                    "N",
+                    "N[chr5:1[",
+                    ".",
+                    "PASS",
+                    "SVTYPE=BND;MATEID=aa,mm",
+                    *GT,
+                )
+            ],
         )
         (record,) = read_records(vcf)
         assert record.record_id == "aa|mm|zz"
@@ -87,8 +98,19 @@ class TestRecordIdentity:
     def test_mateid_is_ignored_for_non_breakends(self, tmp_path: Path) -> None:
         vcf = write_vcf(
             tmp_path / "delmate.vcf",
-            [("chr17", "7670000", "d1", "N", "<DEL>", ".", "PASS",
-              "SVTYPE=DEL;END=7700000;MATEID=d2", *GT)],
+            [
+                (
+                    "chr17",
+                    "7670000",
+                    "d1",
+                    "N",
+                    "<DEL>",
+                    ".",
+                    "PASS",
+                    "SVTYPE=DEL;END=7700000;MATEID=d2",
+                    *GT,
+                )
+            ],
         )
         (record,) = read_records(vcf)
         assert record.record_id == "d1"
@@ -251,8 +273,19 @@ class TestParserEdgeCases:
     def test_info_with_empty_entries(self, tmp_path: Path) -> None:
         vcf = write_vcf(
             tmp_path / "oddinfo.vcf",
-            [("chr17", "7670000", "x", "N", "N[chr5:1[", ".", "PASS",
-              "SVTYPE=BND;;IMPRECISE", *GT)],
+            [
+                (
+                    "chr17",
+                    "7670000",
+                    "x",
+                    "N",
+                    "N[chr5:1[",
+                    ".",
+                    "PASS",
+                    "SVTYPE=BND;;IMPRECISE",
+                    *GT,
+                )
+            ],
         )
         (record,) = read_records(vcf)
         assert record.sv_type == "BND"
@@ -287,8 +320,19 @@ class TestParserEdgeCases:
     def test_empty_mateid_falls_back_to_own_id(self, tmp_path: Path) -> None:
         vcf = write_vcf(
             tmp_path / "emptymate.vcf",
-            [("chr17", "7670000", "solo", "N", "N[chr5:1[", ".", "PASS",
-              "SVTYPE=BND;MATEID=,", *GT)],
+            [
+                (
+                    "chr17",
+                    "7670000",
+                    "solo",
+                    "N",
+                    "N[chr5:1[",
+                    ".",
+                    "PASS",
+                    "SVTYPE=BND;MATEID=,",
+                    *GT,
+                )
+            ],
         )
         (record,) = read_records(vcf)
         assert record.record_id == "solo"

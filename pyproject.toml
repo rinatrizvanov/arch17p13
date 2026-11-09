@@ -24,6 +24,9 @@ classifiers = [
 # Runtime dependencies are intentionally empty. See SCOPE.md.
 dependencies = []
 
+[project.scripts]
+arch17p13 = "arch17p13.cli:main"
+
 [dependency-groups]
 dev = [
   "pytest>=8.0",
@@ -42,6 +45,11 @@ addopts = "-q --strict-markers"
 [tool.coverage.run]
 branch = true
 source = ["arch17p13"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
 
 [tool.ruff]
 line-length = 100

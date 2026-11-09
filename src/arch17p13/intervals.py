@@ -60,6 +60,7 @@ def features_for_position(chrom: str | None, pos: int) -> tuple[str, ...]:
     if canonical is None or not (LOCUS_START <= pos < LOCUS_END):
         return ()
     return tuple(
-        name for name, feat_chrom, start, end in FEATURES
+        name
+        for name, feat_chrom, start, end in FEATURES
         if feat_chrom == canonical and start <= pos < end
     )

@@ -127,8 +127,17 @@ class TestSpansLocusDivergence:
         vcf = write_vcf(
             tmp_path / "mixed.vcf",
             [
-                ("chr17", "7000000", "broad", "N", "<DEL>", ".", "PASS",
-                 "SVTYPE=DEL;END=8000000", *GT),
+                (
+                    "chr17",
+                    "7000000",
+                    "broad",
+                    "N",
+                    "<DEL>",
+                    ".",
+                    "PASS",
+                    "SVTYPE=DEL;END=8000000",
+                    *GT,
+                ),
                 ("chr17", "7670000", "focal", "N", "N[chr5:1[", ".", "PASS", "SVTYPE=BND", *GT),
             ],
         )

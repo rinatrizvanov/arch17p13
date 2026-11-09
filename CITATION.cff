@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "arch17p13: 17p13.1 TP53/WRAP53 structural-variant architecture classification from VCF"
+abstract: >-
+  A standalone, dependency-free Python library and command-line tool that classifies
+  structural variants at the chr17:7,560,000-7,710,000 (GRCh38) locus into TP53/WRAP53
+  co-disruption architecture categories. Reimplements the categorization logic from a
+  pre-registered computational study of alternative lengthening of telomeres in
+  osteosarcoma, with the category ladder pinned against the reference implementation.
+type: software
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/rinatrizvanov/arch17p13"
+keywords:
+  - genomics
+  - structural variants
+  - TP53
+  - WRAP53
+  - TCAB1
+  - 17p13.1
+  - osteosarcoma
+authors:
+  - family-names: Rizvanov
+    given-names: Rinat
+    orcid: "https://orcid.org/0009-0000-1119-0354"
+references:
+  - type: software
+    title: "Osteosarcoma ALT: classification, and a pre-registered dependency test"
+    notes: >-
+      Reference implementation of the categorization logic. The category ladder in
+      arch17p13 is pinned against part1_alt_classification/src/sv_annotator.py at
+      commit a750daf.
+    repository-code: "https://github.com/rinatrizvanov/osteosarcoma-alt-dependency-research"
+    authors:
+      - family-names: Rizvanov
+        given-names: Rinat
+        orcid: "https://orcid.org/0009-0000-1119-0354"

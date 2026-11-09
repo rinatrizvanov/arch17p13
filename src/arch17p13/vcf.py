@@ -310,9 +310,7 @@ def read_records(
             if sv_type == "BND":
                 mate = _BND_ALT.search(alt)
                 if mate:
-                    breakpoints.append(
-                        _make_breakpoint(mate.group(1), int(mate.group(2)), "MATE")
-                    )
+                    breakpoints.append(_make_breakpoint(mate.group(1), int(mate.group(2)), "MATE"))
             elif end is not None and sv_type in _SPANNING_TYPES:
                 breakpoints.append(_make_breakpoint(chrom, end, "END"))
 
