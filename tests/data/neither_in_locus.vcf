@@ -1,0 +1,15 @@
+##fileformat=VCFv4.3
+##reference=GRCh38
+##contig=<ID=chr17,length=83257441>
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant">
+##INFO=<ID=SVLEN,Number=.,Type=Integer,Description="Length of the variant">
+##INFO=<ID=MATEID,Number=.,Type=String,Description="ID of mate breakend">
+##ALT=<ID=DEL,Description="Deletion">
+##ALT=<ID=DUP,Description="Duplication">
+##ALT=<ID=INS,Description="Insertion">
+##FILTER=<ID=LowQual,Description="Low quality call">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
+chr17	7665000	n1	N	N[chr5:100000[	.	PASS	SVTYPE=BND	GT	0/1
+chr17	7687550	n2	N	N[chr5:200000[	.	PASS	SVTYPE=BND	GT	0/1
