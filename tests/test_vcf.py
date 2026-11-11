@@ -29,7 +29,7 @@ class TestBreakpointDerivation:
 
     def test_deletion_uses_svlen_when_end_absent(self, data_dir: Path) -> None:
         (record,) = read_records(data_dir / "svlen_del.vcf")
-        assert record.end == 7_705_000
+        assert record.end == 7_700_000
         assert {bp.origin for bp in record.breakpoints} == {"POS", "END"}
 
     def test_insertion_has_no_span(self, data_dir: Path) -> None:

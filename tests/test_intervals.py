@@ -46,10 +46,17 @@ class TestFeaturesForPosition:
             (7_665_000, ("TP53_5kb_flank",)),
             (7_668_402, ("TP53_coding",)),
             (7_670_000, ("TP53_coding",)),
-            (7_687_549, ("TP53_coding", "WRAP53_promoter", "intergenic_TP53_WRAP53")),
-            (7_687_550, ("intergenic_TP53_WRAP53",)),
-            (7_687_551, ("TP53_promoter", "WRAP53_coding", "intergenic_TP53_WRAP53")),
+            (7_681_070, ("TP53_coding",)),
+            (7_681_071, ("TP53_coding", "WRAP53_promoter")),
+            # The overlap: one breakpoint, both genes.
+            (7_686_071, ("TP53_coding", "WRAP53_coding", "TP53_WRAP53_overlap")),
+            (7_686_800, ("TP53_coding", "WRAP53_coding", "TP53_WRAP53_overlap")),
+            (7_687_549, ("TP53_coding", "WRAP53_coding", "TP53_WRAP53_overlap")),
+            (7_687_550, ("WRAP53_coding",)),
+            (7_687_551, ("TP53_promoter", "WRAP53_coding")),
             (7_700_000, ("WRAP53_coding",)),
+            (7_703_502, ()),
+            (7_705_000, ("WRAP53_5kb_flank",)),
         ],
     )
     def test_boundary_table(self, pos: int, expected: tuple[str, ...]) -> None:
@@ -58,16 +65,26 @@ class TestFeaturesForPosition:
     def test_last_base_of_tp53_coding_is_still_tp53(self) -> None:
         assert "TP53_coding" in features_for_position("chr17", 7_687_549)
 
-    def test_first_base_of_wrap53_coding_is_not_tp53(self) -> None:
+    def test_base_above_tp53_coding_is_not_tp53(self) -> None:
         assert "TP53_coding" not in features_for_position("chr17", 7_687_551)
 
-    def test_single_base_gap_between_genes_hits_neither(self) -> None:
-        """7,687,550 belongs to no coding window: the one base separating the genes."""
-        features = features_for_position("chr17", 7_687_550)
-        assert "TP53_coding" not in features
-        assert "WRAP53_coding" not in features
+    def test_one_breakpoint_in_the_overlap_hits_both_genes(self) -> None:
+        """The case v0.1.0 could not represent.
 
-    def test_inside_wrap53_but_outside_locus_window_reports_nothing(self) -> None:
+        7,686,800 is in the top of TP53 intron 1, inside WRAP53's body. A break here
+        disrupts both genes. Under v0.1.0's unlifted WRAP53 it returned TP53_coding
+        plus WRAP53_promoter and never WRAP53_coding, so co-disruption read zero.
+        """
+        features = features_for_position("chr17", 7_686_800)
+        assert "TP53_coding" in features
+        assert "WRAP53_coding" in features
+
+    @pytest.mark.parametrize("pos", [7_686_071, 7_686_800, 7_687_549])
+    def test_every_base_of_the_overlap_hits_both_genes(self, pos: int) -> None:
+        features = features_for_position("chr17", pos)
+        assert {"TP53_coding", "WRAP53_coding"} <= set(features)
+
+    def test_outside_locus_window_reports_nothing(self) -> None:
         assert position_in_locus("chr17", 7_715_000) is False
         assert features_for_position("chr17", 7_715_000) == ()
 
@@ -79,5 +96,4 @@ class TestFeaturesForPosition:
         assert features_for_position("chr17", 7_687_551) == (
             "TP53_promoter",
             "WRAP53_coding",
-            "intergenic_TP53_WRAP53",
         )

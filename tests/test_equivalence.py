@@ -21,7 +21,7 @@ _PINS = json.loads((Path(__file__).parent / "data" / "stage1_equivalence.json").
 _CASES: list[dict[str, Any]] = _PINS["cases"]
 
 #: The reference commit the pins are valid for. Changing this needs a regeneration.
-EXPECTED_REFERENCE_COMMIT = "a750daf1051be7eae4982cce2e427d4e973bd95f"
+EXPECTED_REFERENCE_COMMIT = "9eb36dbc66b66d6a73a2736b3df0f91b969d1b7f"
 
 
 def _ids(cases: list[dict[str, Any]]) -> list[str]:

@@ -34,7 +34,7 @@ from pathlib import Path
 from typing import Any
 
 #: The reference commit these pins are valid for.
-EXPECTED_COMMIT = "a750daf1051be7eae4982cce2e427d4e973bd95f"
+EXPECTED_COMMIT = "9eb36dbc66b66d6a73a2736b3df0f91b969d1b7f"
 
 #: Path of the reference module inside that repository.
 REFERENCE_MODULE = Path("part1_alt_classification/src/sv_annotator.py")
@@ -103,6 +103,16 @@ CASES: list[dict[str, Any]] = [
             ("bnd_a|bnd_b", "chr17", 7_670_000),
         ],
     ),
+    # One breakpoint inside the 1,479 bp TP53/WRAP53 overlap. Unreachable under the
+    # pre-erratum coordinate table, where the genes could not intersect at all.
+    _case(
+        "single_breakpoint_in_gene_overlap",
+        "overlap_single_breakpoint.vcf",
+        [
+            ("bnd_overlap", "chr17", 7_686_800),
+            ("bnd_overlap", "chr8", 120_000),
+        ],
+    ),
     _case(
         "two_events_one_per_gene",
         "both_independent.vcf",
@@ -136,7 +146,9 @@ CASES: list[dict[str, Any]] = [
         [
             ("n1", "chr17", 7_665_000),
             ("n1", "chr5", 100_000),
-            ("n2", "chr17", 7_687_550),
+            # Post-erratum, 7,687,550 is inside WRAP53. 7,705,000 is in the 3' flank:
+            # in the locus, in no coding window, which is what this case is for.
+            ("n2", "chr17", 7_705_000),
             ("n2", "chr5", 200_000),
         ],
     ),
@@ -145,7 +157,9 @@ CASES: list[dict[str, Any]] = [
         "svlen_del.vcf",
         [
             ("del_focal", "chr17", 7_670_000),
-            ("del_focal", "chr17", 7_705_000),
+            # 7,705,000 was inside WRAP53 only under the pre-erratum table; the
+            # real gene ends at 7,703,502, so the deletion end moves inside it.
+            ("del_focal", "chr17", 7_700_000),
         ],
     ),
     _case(

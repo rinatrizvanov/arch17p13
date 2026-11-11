@@ -2,11 +2,11 @@
   "provenance": {
     "description": "Expected architecture calls pinned from the reference implementation's category ladder. These are DepMap-based inferences, not a published gold standard.",
     "reference_repository": "https://github.com/rinatrizvanov/osteosarcoma-alt-dependency-research",
-    "reference_commit": "a750daf1051be7eae4982cce2e427d4e973bd95f",
+    "reference_commit": "9eb36dbc66b66d6a73a2736b3df0f91b969d1b7f",
     "reference_module": "part1_alt_classification/src/sv_annotator.py",
-    "reference_module_sha256": "7e1239d11e2d706c1c8cb15ca650a028aa5403a694e3013a823c67c13a372fc9",
+    "reference_module_sha256": "e41b3585947844d2cf201028a3efefa6e49538ead507a47f8562e3a1ee85eb78",
     "generated_by": "scripts/generate_equivalence.py",
-    "generated_at": "2026-11-09T14:44:51Z"
+    "generated_at": "2026-11-11T23:54:59Z"
   },
   "cases": [
     {
@@ -122,6 +122,30 @@
       ],
       "reference_category": "Both-single-SV",
       "reference_reason": "Records hitting both WRAP53_coding and TP53_coding: ['bnd_a|bnd_b']",
+      "expected_category": "Both-single-SV",
+      "divergence": null
+    },
+    {
+      "name": "single_breakpoint_in_gene_overlap",
+      "fixture": "overlap_single_breakpoint.vcf",
+      "options": {
+        "sample": null,
+        "pass_only": true
+      },
+      "breakpoints": [
+        [
+          "bnd_overlap",
+          "chr17",
+          7686800
+        ],
+        [
+          "bnd_overlap",
+          "chr8",
+          120000
+        ]
+      ],
+      "reference_category": "Both-single-SV",
+      "reference_reason": "Records hitting both WRAP53_coding and TP53_coding: ['bnd_overlap']",
       "expected_category": "Both-single-SV",
       "divergence": null
     },
@@ -244,7 +268,7 @@
         [
           "n2",
           "chr17",
-          7687550
+          7705000
         ],
         [
           "n2",
@@ -273,7 +297,7 @@
         [
           "del_focal",
           "chr17",
-          7705000
+          7700000
         ]
       ],
       "reference_category": "Both-single-SV",

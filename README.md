@@ -18,35 +18,37 @@ standard.
 
 ## The locus
 
-TP53 and WRAP53 sit head-to-head on chr17 and share a bidirectional promoter. Their coding
-windows are *immediately adjacent* — this geometry is why the library classifies on breakpoint
-positions rather than interval overlap, and it is the single thing most likely to trip up a
-reimplementation.
+TP53 and WRAP53 are convergent overlapping genes: they run head-to-head, share a
+bidirectional promoter, and their bodies **intersect over 1,479 bp**. That overlap is the
+single thing most likely to trip up a reimplementation, and getting it wrong is silent —
+see [Known-wrong in v0.1.0](#known-wrong-in-v010).
 
 ```
-chr17, GRCh38          locus window  [ 7,560,000 .............. 7,710,000 )
+chr17, GRCh38      locus window  [ 7,560,000 ....................... 7,710,000 )
 
-          TP53  (minus strand)             WRAP53  (plus strand)
-       <---------------------------     --------------------------->
-      +----------------------------+   +-----------------------------+
-      |         TP53_coding        |   |        WRAP53_coding        |
-      +----------------------------+   +-----------------------------+
-      7,668,402          7,687,550     7,687,551           7,725,564
-                                  \   /                            |
-                                   \ /                             |
-                                    ^                              ^
-                                   (a)                            (b)
+   TP53  (minus strand)
+   7,668,402                                           7,687,550
+   +--------------------------------------------------------+
+   |                      TP53_coding                        |
+   +--------------------------------------------------------+
+                                                 +-------------------------+
+                                                 |      WRAP53_coding      |
+                                                 +-------------------------+
+                                                 7,686,071         7,703,502
+                                                     WRAP53  (plus strand)
+
+                                                 |<------>|
+                                                     (a)
 ```
 
-**(a) 7,687,550** is a single base belonging to neither coding window. The two genes meet
-head-to-head here and share a bidirectional promoter, so one breakpoint at the junction can
-legitimately flag both genes — which is why `Both-single-SV` and `Both-independent-SVs` are
-separate categories rather than one "both" category.
+**(a) The overlap, chr17:7,686,071–7,687,550.** This is the top of TP53 intron 1, and it
+lies inside WRAP53's body. **One breakpoint here disrupts both genes.** That is precisely
+what `Both-single-SV` describes, and why it is a separate category from
+`Both-independent-SVs` rather than both being folded into one "both" call.
 
-**(b) WRAP53_coding ends at 7,725,564**, roughly 15 kb past the locus window's close at
-7,710,000. A breakpoint in WRAP53's tail therefore falls outside the locus and reports no
-features at all. The reference behaves identically; it is preserved rather than "fixed",
-because widening the window would change calls.
+Coordinates are Ensembl gene bodies in GRCh37 lifted with the UCSC hg19-to-hg38 chain,
+which is a constant +96,682 across this locus. Both genes sit entirely inside the locus
+window.
 
 ## Install
 
@@ -137,7 +139,7 @@ explanation and a test asserting it by name:
 
 1. **Breakpoint semantics, not interval overlap.** The reference's segment path is a
    *forbidden variable* in the Stage 1 pre-registration — it called 33 of 35 samples
-   `Both-single-SV` off one copy-number segment spanning the adjacent coding windows. An SV
+   `Both-single-SV` off one copy-number segment covering both coding windows. An SV
    covering the locus with no breakpoint inside it is `Neither` here, plus a `spans_locus`
    flag.
 2. **Contig names are normalised.** The reference compares literally against `chr17`, so a
@@ -162,6 +164,32 @@ scope, and changing any frozen constant requires a version bump. See [`SCOPE.md`
   DepMap-based inference in the reference project.
 - **Not a general VCF library.** It reads enough of the spec to find breakpoints at one 150 kb
   locus.
+
+## Known-wrong in v0.1.0
+
+**v0.1.0 shipped a WRAP53 interval that was never lifted from GRCh37.** It carried
+`WRAP53_coding = 7,687,551–7,725,564`, where the start is not a coordinate but "one base
+after TP53 ends". TP53 had been lifted correctly (+96,682); WRAP53 had not. The real extent
+is 7,686,071–7,703,502.
+
+Two consequences, opposite in sign:
+
+- **The overlap was unrepresentable.** A breakpoint in 7,686,071–7,687,550 returned
+  `TP53_coding` and `WRAP53_promoter`, never `WRAP53_coding`. `Both-single-SV` was therefore
+  unreachable from a single breakpoint, and any co-disruption count read zero while every
+  test stayed green.
+- **22,062 bp of phantom gene body.** Breakpoints up to 7,725,564 counted as WRAP53 coding
+  hits, past the gene's real end.
+
+If you ran v0.1.0, any `TP53-only` call driven by a breakpoint in 7,686,071–7,687,550 should
+have been `Both-single-SV`, and any `TCAB1-only` or both-genes call driven by a breakpoint
+above 7,703,502 was spurious. Re-run with v0.2.0.
+
+Guards added so it cannot recur: `regions.check_genes_overlap` raises at import if the two
+coding windows stop intersecting, and `tests/test_regions.py::test_coding_windows_overlap`
+plus `tests/test_intervals.py::test_one_breakpoint_in_the_overlap_hits_both_genes` assert
+the geometry directly. The reference implementation's account is in
+[`docs/erratum_wrap53_coordinates.md`](https://github.com/rinatrizvanov/osteosarcoma-alt-dependency-research/blob/main/part1_alt_classification/docs/erratum_wrap53_coordinates.md).
 
 ## Development
 

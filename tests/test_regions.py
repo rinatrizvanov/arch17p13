@@ -8,6 +8,8 @@ that still needs its CHANGELOG entry.
 
 from __future__ import annotations
 
+import pytest
+
 from arch17p13.regions import (
     ASSEMBLY,
     CATEGORIES,
@@ -16,8 +18,10 @@ from arch17p13.regions import (
     LOCUS_CHROM,
     LOCUS_END,
     LOCUS_START,
+    OVERLAP_WIDTH,
     TP53_CODING,
     WRAP53_CODING,
+    check_genes_overlap,
 )
 
 
@@ -50,31 +54,57 @@ def test_both_decisive_features_are_declared() -> None:
     assert WRAP53_CODING in names
 
 
-def test_coding_windows_are_adjacent_not_overlapping() -> None:
-    """The geometry behind the segment-path artefact documented in SCOPE.md.
+def test_coding_windows_overlap() -> None:
+    """The central geometric fact of this locus.
 
-    ``TP53_coding`` ends exactly one base below where ``WRAP53_coding`` begins, so any
-    interval covering the junction overlaps both genes. This adjacency is the reason
-    v0.1 classifies on breakpoints rather than on interval overlap.
+    TP53 and WRAP53 are convergent overlapping genes. Their bodies intersect over
+    1,479 bp at the top of TP53 intron 1, so one breakpoint there disrupts both. If
+    this ever stops being true, ``Both-single-SV`` becomes unreachable from a single
+    breakpoint and co-disruption counts silently read zero. v0.1.0 shipped exactly
+    that bug; see CHANGELOG.md.
     """
     lookup = {name: (start, end) for name, _, start, end in FEATURES}
     tp53_start, tp53_end = lookup[TP53_CODING]
     wrap53_start, wrap53_end = lookup[WRAP53_CODING]
-    assert tp53_end < wrap53_start
-    assert wrap53_start - tp53_end == 1
-    assert tp53_start < tp53_end < wrap53_start < wrap53_end
+    assert wrap53_start < tp53_end, "the genes must overlap, not merely abut"
+    assert tp53_start < wrap53_start
+    assert tp53_end < wrap53_end
+    assert min(tp53_end, wrap53_end) - max(tp53_start, wrap53_start) == OVERLAP_WIDTH
 
 
-def test_wrap53_coding_extends_past_the_locus_window() -> None:
-    """A real asymmetry the reference has, preserved deliberately.
+def test_overlap_feature_matches_the_intersection() -> None:
+    """``TP53_WRAP53_overlap`` must be exactly the intersection, not an approximation."""
+    lookup = {name: (start, end) for name, _, start, end in FEATURES}
+    tp53 = lookup[TP53_CODING]
+    wrap53 = lookup[WRAP53_CODING]
+    assert lookup["TP53_WRAP53_overlap"] == (
+        max(tp53[0], wrap53[0]),
+        min(tp53[1], wrap53[1]),
+    )
 
-    ``WRAP53_coding`` runs to 7,725,564 but the locus window stops at 7,710,000, so a
-    breakpoint in the tail of WRAP53 is gated out and reports no features at all. The
-    reference behaves the same way because it only annotates in-locus positions.
+
+def test_check_genes_overlap_rejects_disjoint_windows() -> None:
+    """The invariant has to actually fire; v0.1.0's table is the regression case."""
+    with pytest.raises(ValueError, match="do not intersect"):
+        check_genes_overlap((7_668_402, 7_687_550), (7_687_551, 7_725_564))
+
+
+def test_check_genes_overlap_accepts_the_shipped_table() -> None:
+    lookup = {name: (start, end) for name, _, start, end in FEATURES}
+    check_genes_overlap(lookup[TP53_CODING], lookup[WRAP53_CODING])
+
+
+def test_both_genes_fit_inside_the_locus_window() -> None:
+    """With WRAP53 lifted, the window contains both genes end to end.
+
+    Under the v0.1.0 table WRAP53 ran 15 kb past the window and its tail was gated
+    out. That asymmetry was an artefact of the unlifted coordinate, not a property
+    of the locus.
     """
     lookup = {name: (start, end) for name, _, start, end in FEATURES}
-    _, wrap53_end = lookup[WRAP53_CODING]
-    assert wrap53_end > LOCUS_END
+    for feature in (TP53_CODING, WRAP53_CODING):
+        start, end = lookup[feature]
+        assert LOCUS_START <= start < end <= LOCUS_END, f"{feature} escapes the window"
 
 
 def test_categories_cover_the_ladder_and_the_sentinel() -> None:

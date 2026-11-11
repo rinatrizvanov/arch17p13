@@ -153,7 +153,12 @@ class TestUsage:
         assert excinfo.value.code == 2
 
     def test_version_matches_the_package(self) -> None:
-        assert __version__ == "0.1.0"
+        assert __version__ == "0.2.0"
+
+    def test_version_has_a_changelog_entry(self) -> None:
+        """A release without an entry is the one nobody can reconstruct later."""
+        changelog = Path(__file__).resolve().parent.parent / "CHANGELOG.md"
+        assert f"## [{__version__}]" in changelog.read_text()
 
 
 class TestModuleExecution:

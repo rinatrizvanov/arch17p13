@@ -11,4 +11,4 @@
 ##FILTER=<ID=LowQual,Description="Low quality call">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-chr17	7670000	del_focal	N	<DEL>	.	PASS	SVTYPE=DEL;SVLEN=-35000	GT	0/1
+chr17	7670000	del_focal	N	<DEL>	.	PASS	SVTYPE=DEL;SVLEN=-30000	GT	0/1

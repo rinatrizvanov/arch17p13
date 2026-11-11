@@ -17,7 +17,7 @@ from .classify import SPANS_LOCUS, Category, Result, classify_records, classify_
 from .regions import ASSEMBLY, CATEGORIES, COMPLEX_THRESHOLD, FEATURES
 from .vcf import Breakpoint, SvRecord, VcfError, read_records
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "ASSEMBLY",

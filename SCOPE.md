@@ -48,9 +48,9 @@ inside a feature; `annotate_segments` asks whether an interval overlaps one. The
 path produced `sv_architecture_auto`, which the Stage 1 pre-registration lists as a
 **forbidden variable**: *"artefactual, 33 of 35 rows reading 'Both-single-SV' from a single
 CN segment spanning both WRAP53 and TP53"*
-(`autoresearch/iteration_01_tcab1_predicts_alt_status/prespec.md`). The cause is geometric —
-`TP53_coding` ends at 7,687,550 and `WRAP53_coding` begins at 7,687,551, so any interval
-wider than ~57 kb covering the junction overlaps both genes. Broad 17p loss is near-universal
+(`autoresearch/iteration_01_tcab1_predicts_alt_status/prespec.md`). The cause is geometric — TP53 and
+WRAP53 overlap, so *any* interval covering 7,686,071-7,687,550 overlaps both genes, and
+any interval covering both bodies is only ~35 kb wide. Broad 17p loss is near-universal
 in osteosarcoma, so overlap semantics would return `Both-single-SV` for almost every real
 sample. v0.1 therefore classifies on breakpoints only. An SV that covers the locus without
 placing a breakpoint inside it is reported as `Neither` with the `spans_locus` flag, never as
@@ -63,10 +63,11 @@ counts `n_in_window` internally. A VCF is whole-genome, so filtering in the call
 every sample `Complex`. This library filters to the locus window before the ladder, matching
 the reference's documented intent and its own reason strings ("in locus window").
 
-**3. `WRAP53_coding` extends past the locus window.** The feature runs to 7,725,564 but the
-window stops at 7,710,000, so a breakpoint in WRAP53's tail reports no features at all. The
-reference behaves identically, because it only annotates in-locus positions. Preserved rather
-than "fixed", since widening the window would change calls.
+**3. Both genes lie entirely inside the locus window.** `TP53_coding`
+(7,668,402-7,687,550) and `WRAP53_coding` (7,686,071-7,703,502) are both contained in
+7,560,000-7,710,000, so no part of either gene is gated out. Until v0.2.0 this section
+recorded the opposite — WRAP53 running 15 kb past the window — which was an artefact of an
+unlifted coordinate, not a property of the locus. See `CHANGELOG.md`.
 
 **4. No coordinate conversion.** Feature bounds are compared directly against VCF `POS`.
 VCF is 1-based and the reference compares its own inputs to the same bounds without
